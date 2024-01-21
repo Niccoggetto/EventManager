@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario Alcolici</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #ffdada;
+        }
+        body.modal-open{
+            ovrflow: hidden;
+        }
+        #scrollview {
+            overflow-y: scroll;
+            height: 90%;
+            width: 80%;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #ffffff;
+        }
+        .alcoholic-item {
+            margin-bottom: 10px;
+            background-color: #ffffff;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50%;
+            height: 40%;
+            max-widht: 400px;
+            background-color: #ffdada;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        .modal-content {
+            width: 90%;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        .quantity-input {
+            width: 80%; /* Larghezza del campo di input */
+            padding: 10px; /* Padding per una migliore presentazione */
+            box-sizing: border-box; /* Include il padding nella larghezza totale */
+            margin-bottom: 10px; /* Aggiunto spazio sotto il campo di input */
+            border-radius: 10px;
+        }
+
+        .save-btn {
+            width: 80%; /* Larghezza del pulsante */
+            padding: 10px; /* Padding per una migliore presentazione */
+            box-sizing: border-box; /* Include il padding nella larghezza totale */
+            border-radius: 10px;
+        }
+
+
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.alcoholic-item').each(function() {
+                var itemId = $(this).find('.id').text();
+                var editBtn = $('<button class="edit-btn">Modifica</button>');
+                var modal = $('<div class="modal"></div>');
+                var modalContent = $('<div class="modal-content"></div>');
+                var quantityInput = $('<input type="number" class="quantity-input" placeholder="Nuova quantità">');
+                var saveBtn = $('<button class="save-btn">Salva</button>');
+
+                editBtn.click(function() {
+                    modal.show();
+                    $('body').addClass('modal-open');
+                });
+
+                saveBtn.click(function() {
+                    saveData();
+                });
+
+                // Aggiungi un gestore di eventi keypress al campo di input
+                quantityInput.keypress(function(event) {
+                    if (event.which === 13) { // Il tasto "Invio" ha il codice 13
+                        saveData();
+                    }
+                });
+
+                function saveData() {
+                    var newQuantity = quantityInput.val();
+                    if (!newQuantity || isNaN(newQuantity)) {
+                        alert("Inserisci una quantità valida.");
+                        return;
+                    }
+
+                    // Invia i dati al backend
+                    $.ajax({
+                        url: '/manage_quantity',
+                        type: 'POST',
+                        data: {id: itemId, quantity: newQuantity},
+                        success: function(response) {
+                            // Puoi gestire la risposta del backend qui, se necessario
+                            console.log(response);
+                            modal.hide();
+                            location.reload(); // Ricarica la pagina
+                            $('body').removeClass('modal-open');
+                        },
+                        error: function(error) {
+                            console.error(error);
+                        }
+                    });
+                }
+
+                modalContent.append(quantityInput);
+                modalContent.append(saveBtn);
+                modal.append(modalContent);
+                $(this).append(editBtn);
+                $('body').append(modal);
+            });
+        });
+    </script>
+
+</head>
+
+<body>
+
+    <div id="scrollview">
+        {% for item in alcohol %}
+            <div class="alcoholic-item">
+                <p class="id">{{ item.id }}</p>
+                <p>Nome: {{ item.name }}</p>
+                <p>Quantità: {{ item.quantity }}</p>
+            </div>
+        <hr>
+        {% endfor %}
+    </div>
+
+</body>
+</html>

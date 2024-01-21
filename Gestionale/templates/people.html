@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista Partecipanti</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #scrollview {
+            overflow-y: scroll;
+            max-height: 500px;
+            width: 600px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        .participant {
+            margin-bottom: 10px;
+        }
+        #searchInput{
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <input type="text" id="searchInput" placeholder="Cerca per nome/cognome" style="margin-bottom: 20px;">
+
+    <div id="scrollview">
+        {% for participant in participants %}
+            <div class="participant" data-name="{{ participant.name }}" data-surname="{{ participant.surname }}">
+                <p>{{ participant.name }} {{ participant.surname }}, {{ participant.phone }},</p>
+                <p>Bevande: {{ participant.drinks }}</p>
+                <p>Pagamento: {{ participant.payment }}</p>
+                <label>
+                    Presenza:
+                    <input type="checkbox" id="presence-{{ participant.id }}" {% if participant.presence == 1 %}checked{% endif %} onclick="updatePresence({{ participant.id }}, this.checked)">
+                </label>
+                <hr>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        document.getElementById('searchInput').addEventListener('input', function() {
+            searchItems();
+        });
+
+        function searchItems() {
+            var searchValue = document.getElementById('searchInput').value.toLowerCase();
+            var participants = document.getElementsByClassName('participant');
+
+            for (var i = 0; i < participants.length; i++) {
+                var name = participants[i].getAttribute('data-name').toLowerCase();
+                var surname = participants[i].getAttribute('data-surname').toLowerCase();
+
+                if (name.includes(searchValue) || surname.includes(searchValue)) {
+                    participants[i].style.display = 'block';
+                } else {
+                    participants[i].style.display = 'none';
+                }
+            }
+        }
+
+        function updatePresence(participantId, isChecked) {
+            // Rimane invariata la funzione di aggiornamento della presenza
+            fetch('/update_presence', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `participant_id=${participantId}&presence=${isChecked ? 1 : 0}`,
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Errore durante l\'aggiornamento dell\'attributo presence');
+                }
+            })
+            .catch(error => console.error(error));
+        }
+    </script>
+
+</body>
+</html>

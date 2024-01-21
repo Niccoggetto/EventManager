@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valori Alcolici</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .alcohol-container {
+            width: 80%;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .alcohol-item {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="alcohol-container">
+        <h2>Valori Alcolici</h2>
+        <form action="/submit" method="post">
+            {% for alcohol in alcohols %}
+                <div class="alcohol-item">
+                    <label for="{{ alcohol }}">{{ alcohol }}:</label>
+                    <input type="number" step="0.1" name="{{ alcohol }}" id="{{ alcohol }}" required>
+                </div>
+            {% endfor %}
+            <button type="submit">Invia</button>
+        </form>
+    </div>
+</body>
+</html>
