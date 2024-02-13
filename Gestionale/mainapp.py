@@ -33,6 +33,15 @@ def update_presence_route():
     return 'Success'
 
 
+@app.route('/update_payment', methods=['POST'])
+def update_payment_route():
+    participant_id = request.form['participant_id']
+    payment = request.form['payment']
+    update_payment(participant_id, payment)
+
+    return 'Success'
+
+
 # area inventari
 
 
@@ -54,14 +63,15 @@ def manage_quantity():
     manage_qt(item_id, new_quantity)
     return 'Success'
 
+# area spesa e approvvigionamenti
 
-# area bar
 
+@app.route('/shopping_list', methods=['POST', 'GET'])
+def shopping_list():
+    calculate_shopping()
+    shop_list = show_shopping()
+    return render_template('shopping_list.html', list=shop_list)
 
-'''@app.route('/bar')
-def cocktail_orders():
-
-    return render_template()'''
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shopping List</title>
+</head>
+
+<body>
+
+    <div id="scrollview">
+        {% for item in alcohol %}
+            <div class="alcoholic-item">
+
+                <p>Nome: {{ item.name }}</p>
+                <p>Quantità: {{ item.quantity }}</p>
+            </div>
+        <hr>
+        {% endfor %}
+    </div>
+
+</body>
+</html>
